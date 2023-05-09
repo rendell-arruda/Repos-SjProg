@@ -7,6 +7,7 @@ export default function Main() {
   const [newRepo, setNewRepo] = useState('');
   const [repositorios, setRepositorios] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [alert, setAlert] = useState(null);
 
   // useCallback é uma função que retorna uma função
   const handleSubmit = useCallback(
@@ -16,8 +17,22 @@ export default function Main() {
       // fazer a chamada a api e requisitar os dados
       async function submit() {
         setLoading(true);
+        setAlert(null);
         try {
+          if (newRepo === '') {
+            throw new Error('Você precisa indicar um repositorio');
+          }
+
           const response = await api.get(`repos/${newRepo}`);
+
+          //verificar se o repositorio ja existe
+          const hasRepo = repositorios.find(r => repo =>
+            repo.full_name === newRepo
+          );
+
+          if (hasRepo) {
+            throw new Error('Repositorio duplicado');
+          }
 
           const data = {
             name: response.data.full_name
@@ -26,6 +41,7 @@ export default function Main() {
           setRepositorios([...repositorios, data]);
           setNewRepo('');
         } catch (error) {
+          setAlert(true);
           console.log(error);
         } finally {
           setLoading(false);
@@ -38,12 +54,14 @@ export default function Main() {
 
   function handleInputChange(e) {
     setNewRepo(e.target.value);
+    setAlert(null);
   }
 
   const handleDelete = useCallback(
     repo => {
-      //
+      // filter vai retornar todos os repositorios que forem diferentes do que foi passado
       const find = repositorios.filter(r => r.name !== repo);
+      // setRepositorios vai receber o find, que é o array filtrado
       setRepositorios(find);
     },
     [repositorios]
@@ -55,7 +73,7 @@ export default function Main() {
         <FaGithub size={25} /> Meus repositorios
       </h1>
 
-      <Form onSubmit={handleSubmit}>
+      <Form onSubmit={handleSubmit} error={alert}>
         <input
           type="text"
           placeholder="Adicionar repositorios"

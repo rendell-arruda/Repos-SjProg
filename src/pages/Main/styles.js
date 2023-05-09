@@ -26,7 +26,7 @@ export const Form = styled.form`
 
   input {
     flex: 1; /* Ocupa todo o espaço possivel */
-    border: 1px solid #ddd;
+    border: 1px solid ${props => (props.error ? '#ff0000' : '#eee')};
     padding: 10px 15px;
     border-radius: 4px;
     font-size: 16px;
