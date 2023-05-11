@@ -34,6 +34,7 @@ export default function Repositorio({ match }) {
     }
     load();
   }, [repositorio]);
+
   return (
     <Container>
       <h1></h1>
