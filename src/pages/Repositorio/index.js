@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Container } from './styles';
+import { Container, Owner, Loading, BackButton } from './styles';
+import { FaArrowLeft } from 'react-icons/fa';
 
 import api from '../../services/api';
 
@@ -8,7 +9,9 @@ import api from '../../services/api';
 
 export default function Repositorio({ match }) {
   const { repositorio } = useParams();
+  //so vai ter um repositoiro por vez
   const [stateRepositorio, setStateRepositorio] = useState({});
+  //vai ter uma lista de issues
   const [issues, setIssues] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -35,9 +38,22 @@ export default function Repositorio({ match }) {
     load();
   }, [repositorio]);
 
+  if (loading) {
+    return <Loading>Carregando...</Loading>;
+  }
   return (
     <Container>
-      <h1></h1>
+      <BackButton to="/">
+        <FaArrowLeft size={25} color="#000" />
+      </BackButton>
+      <Owner>
+        <img
+          src={stateRepositorio.owner.avatar_url}
+          alt={stateRepositorio.owner.login}
+        />
+        <h1>{stateRepositorio.name}</h1>
+        <p>{stateRepositorio.description}</p>
+      </Owner>
     </Container>
   );
 }
