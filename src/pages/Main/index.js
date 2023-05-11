@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { FaGithub, FaPlus, FaSpinner, FaBars, FaTrash } from 'react-icons/fa';
 import { Container, Form, SubmitButton, List, DeleteButton } from './styles';
+import { Link } from 'react-router-dom';
 
 import api from '../../services/api';
 
@@ -10,7 +11,7 @@ export default function Main() {
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState(null);
 
-  // Buscar
+  // Buscar do localStorage ao iniciar
   useEffect(() => {
     const repoStorage = localStorage.getItem('repos');
 
@@ -23,6 +24,7 @@ export default function Main() {
   useEffect(() => {
     localStorage.setItem('repos', JSON.stringify(repositorios));
   }, [repositorios]);
+
   // useCallback é uma função que retorna uma função
   const handleSubmit = useCallback(
     e => {
@@ -32,15 +34,17 @@ export default function Main() {
         setLoading(true);
         setAlert(null);
         try {
-          //verificar se o repositorio ja existe
+          //verificar se esta em branco
           if (newRepo === '') {
             throw new Error('Você precisa indicar um repositorio!');
           }
 
+          //requisição a api
           const response = await api.get(`repos/${newRepo}`);
 
-          const hasRepo = repositorios.find(repo => repo.name === newRepo);
           //verificar se o repositorio ja existe
+          const hasRepo = repositorios.find(repo => repo.name === newRepo);
+
           if (hasRepo) {
             throw new Error('Repositorio Duplicado');
           }
@@ -115,9 +119,9 @@ export default function Main() {
               </DeleteButton>
               {repo.name}
             </span>
-            <a href="">
+            <Link to={`/repositorio/${encodeURIComponent(repo.name)}`}>
               <FaBars size={20} />
-            </a>
+            </Link>
           </li>
         ))}
       </List>
